@@ -1,0 +1,138 @@
+{% extends 'Layouts/admin-master.html' %}
+{% load static %}
+
+{% block Styles %}
+
+{% endblock %}
+
+{% block content %}
+    {% if not request.user.is_staff %}
+        {% comment %} {% if not request.user.contract_information.is_complete %}
+            <h1 class="py-3 breadcrumb-wrapper mb-4">به سامانه صدور آنلاین کد بورسی بورس کالا خوش آمدید!</h1>
+        {% endif %} {% endcomment %}
+        <div class="row mb-12">
+            <div class="col-12">
+                <div class="card-header sticky-element bg-label-secondary d-flex justify-content-sm-between align-items-sm-center flex-column flex-sm-row">
+                    <h5 class="card-title mb-sm-0 me-2">سامانه معاملات و اخذ کد بورس کالا</h5>
+                    <div class="action-btns">
+                        <a href="#" class="app-brand-link">
+                            <span class="app-brand-logo demo"><img src="{% static 'admin_panel/assets/Logo-BKI-Avatar.svg' %}"/><title>کارگزاری بانک کشاورزی |  صدور کد معاملاتی بورس کالا</title></span>
+                            <span class="app-brand-text demo menu-text fw-bold ms-2"><img src="{% static 'admin_panel/assets/Logo-BKI-Title.png' %}" height="30"/></span>
+                        </a>
+                    </div>
+                </div>
+                {% if not request.user.contract_information.is_complete %}
+                <!--  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  -->
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <img height="50" src="{% static 'admin_panel/assets/ime-logo.png' %}"/>
+                            <h1 style="font-size: 1.2rem;">به سامانه صدور آنلاین کد معاملاتی بورس کالا کارگزاری بانک کشاورزی خوش آمدید </h1>
+
+                            <div style="text-align:right;">
+                                <p><span class="badge badge-center rounded-pill bg-secondary"><i class="bx bx-bell"></i></span>
+                                    شما از طریق امکانات این سامانه می‌توانید درخواست خود را ثبت کرده و تا مرحله صدور کد معاملاتی بورس کالا آن را پیگیری نمایید.</p>
+                                <p><span class="badge badge-center rounded-pill bg-secondary"><i class="bx bx-bell"></i></span>
+                                    برای فعال شدن دکمه
+                                    <span class="badge bg-primary" style="font-size: 0.9rem;">ذخیره و ادامه > </span>
+                                     در فرم‌ها، باید تمام فیلدهای خواسته‌شده آن صفحه را تکمیل کرده باشید. بخش زیادی از اطلاعات شما، از سامانه سجام دریافت گردیده و در فرم‌ها جاگذاری شده است.</p>
+                                <p><span class="badge badge-center rounded-pill bg-secondary"><i class="bx bx-bell"></i></span>
+                                    تا زمانی که بر روی دکمه
+                                    <span class="badge bg-success" style="font-size: 0.9rem;">تایید نهایی و ثبت درخواست</span>
+                                    کلیک نکرده باشید، امکان ویرایش فرم را دارید. پس از آن، اطلاعات شما برای بررسی و صدور کد ارسال می‌گردد.
+                                </p>
+                                <p><span class="badge badge-center rounded-pill bg-secondary"><i class="bx bx-bell"></i></span>
+                                در نظر داشته باشید برای تکمیل و ثبت فرم، به تصویر مدارک نیاز دارید، لذا پیش از شروع به تکمیل فرم درخواست، آنها را آماده داشته باشید:
+                                    <div class="row g-3" style="line-height: 2rem; padding-right: 35px;">
+                                        <div class="col-sm-6">
+                                            • تصویر نمونه امضاء در زمینه سفید و کاملا واضح و خوانا
+                                            <br/>• تصویر شناسنامه - صفحه اول
+                                            <br/>• تصویر شناسنامه - صفحه دوم
+                                            <br/>• تصویر شناسنامه - صفحه آخر
+                                            <br/>• تصویر روی کارت ملی
+                                        </div>
+                                        <div class="col-sm-6">
+                                            • تصویر پشت کارت ملی
+                                            <br/>• تصویر رسید کارت ملی هوشمند در صورت وجود (اختیاری)
+                                            <br/>• تصویر جواز کسب / مجوز فعالیت (اختیاری)
+                                            <br/>• تصویر مدارک ثبت نام سامانه امور مالیاتی و کد اقتصادی (اختیاری)
+                                            <br/>• تصویر مدارک ثبت نام در سامانه جامع انبارها (اختیاری)
+                                        </div>
+                                    </div>
+                                </p>
+
+                                <p><span class="badge badge-center rounded-pill bg-secondary"><i class="bx bx-bell"></i></span>
+                                    فرمت‌های قابل‌قبول مدارک jpg, jpeg, png, bmp هستند و حداکثر حجم هر فایل: 1 مگابایت (1024 کیلو بایت) می‌باشد. تصاویر باید اسکن شده باشند و عکس از روی مدارک و فایل‌های ناخوانا مورد پذیرش نمی‌باشد.
+                                </p>
+                                <p><span class="badge badge-center rounded-pill bg-secondary"><i class="bx bx-bell"></i></span>
+                                    توجه داشته باشید تکمیل بودن اطلاعات و فایل‌های ثبت شده، در فرآیند صدور کد معاملاتی شما تاثیرگذار هستند، لذا نهایت دقت را در تکمیل فرم‌ها مبذول فرمایید.
+                                </p>
+                            </div>
+                            <br/>
+                            <a href="{% url 'contract-request' %}">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editUser">ثبت درخواست</button>
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+
+
+                {% if request.user.contract_information.is_complete %}
+                    <!--  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  -->
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <br/><br/><br/>آخرین وضعیت درخواست شما:
+                            <span class="badge bg-{{ request.user.contract_information.get_req_status_class }}">{{ request.user.contract_information.get_req_status }}</span>
+
+                            {% if request.user.contract_information.req_status == '20' %}
+                                <br/><br/><br/>
+                                <h5>
+                                    مشتری گرامی کارگزاری بانک کشاورزی! درخواست شما نیاز به تکمیل و اصلاح دارد.<br/>
+                                    لطفا با توجه به توضیحات زیر، درخواست خود را ویرایش و تکمیل نموده و مجدد ثبت کنید.
+                                </h5>
+                                <br/>
+
+                                <div class="alert alert-warning alert-dismissible" role="alert" style="width:70%; margin: 0 auto;">
+                                    <h6 class="alert-heading mb-1" align="right"><i class="bx bx-xs bx-wallet me-2"></i>اصلاحات موردنیاز:</h6>
+                                    {{ request.user.contract_information.reason_of_reject | default_if_none:'توضیحی ثبت نشده است.' }}
+                                  </div>
+
+                                <br/>
+                                <br/>
+                                <a href="{% url 'contract-request' %}">
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editUser">ویرایش درخواست</button>
+                                </a>
+                                <br/><br/><br/>
+                            {% endif %}
+
+                            {% if request.user.contract_information.req_status == '40' %}
+                                <br/>
+                                <br/>شناسه کاربری:
+
+                                <span class="badge bg-info">
+                                    {{ request.user.contract_information.user_code | default_if_none:'---' }}
+                                </span>
+                                <p>{{ request.user.contract_information.reason_of_approved | default_if_none:'---' }}</p>
+                            {% endif %}
+
+                            {%  if request.user.contract_information.req_status != '20' and  request.user.contract_information.req_status != '40' %}
+                                <br/><br/>
+                                <p>درخواست شما در حال بررسی می‌باشد. در صورت تغییر وضعیت، مراتب از طریق پیامک به شما اطلاع‌رسانی خواهد شد</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block Scripts %}
+    <script>
+        {% if messages %}
+            {% for item in messages %}
+                createToast('success', '{{ item }}');
+            {% endfor %}
+        {% endif %}
+    </script>
+{% endblock %}

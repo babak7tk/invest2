@@ -1,0 +1,110 @@
+{% load static %}
+
+<!-- Menu -->
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+    <div class="app-brand demo">
+        <a href="{% url 'dashboard' %}" class="app-brand-link">
+            <!-- 
+            <span class="app-brand-logo demo"><img src="{% static 'admin_panel/assets/logo-svg.svg' %}"/><title>icon</title></span>
+            &nbsp;<span class="app-brand-text demo h5 mb-0 fw-bold"> سامانه نوین</span>
+            -->
+            <span class="app-brand-logo demo"><img src="{% static 'admin_panel/assets/Logo-BKI-Avatar.svg' %}"/><title>کارگزاری بانک کشاورزی | سامانه معاملات و اخذ کد بورس کالا</title></span>
+            <span class="app-brand-text demo menu-text fw-bold ms-2"><img src="{% static 'admin_panel/assets/Logo-BKI-Title.png' %}" height="30"/></span>
+        </a>
+        <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
+            <i class="bx menu-toggle-icon d-none d-xl-block fs-4 align-middle"></i>
+            <i class="bx bx-x d-block d-xl-none bx-sm align-middle"></i>
+        </a>
+    </div>
+
+    <div class="menu-divider mt-0"></div>
+
+    <div class="menu-inner-shadow"></div>
+
+    <ul class="menu-inner py-1">
+        <!-- Page -->
+
+        {% comment %} 
+        <li class="menu-item {% if request.path == homepage %} active {% endif %}">
+              <a href="{% url 'bki_homepage' %}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <div data-i18n="Homepage">صفحه اصلی</div>
+              </a>
+        </li>  
+        {% endcomment %}
+
+        <!-- داشبورد -->
+        <li class="menu-item {% if request.resolver_match.url_name == 'dashboard-charts' %} active {% endif %}">
+            <a href="{% url 'dashboard-charts' %}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-bar-chart-square"></i>
+                <div data-i18n="Dashboard">داشبورد</div>
+            </a>
+        </li>
+
+        <li class="menu-header small text-uppercase"><div class="divider text-start" style="margin: 0px !important;"><div class="divider-text small"> درخواست‌ها</div></div></li>
+
+        <!-- همه درخواست‌ها -->
+        <li class="menu-item  {% if request.resolver_match.url_name == 'contract-request-list' %}active{% endif %}">
+            <a href="{% url 'contract-request-list' %}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-folder-minus"></i>
+                <div data-i18n="IME-Request-Finished">لیست درخواست‌ها</div>&nbsp;
+                <span class="badge badge-center rounded-pill bg-secondary">{{ all_requests_count }}</span>
+            </a>
+        </li>        
+        {% if request.user.is_superuser %}
+        <li class="menu-header small text-uppercase"><div class="divider text-start" style="margin: 0px !important;"><div class="divider-text">مدیریت سامانه</div></div></li>
+        <!--  کاربران و نقش‌ها -->
+        <li class="menu-item">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-user"></i>
+                <div data-i18n="SysUsers">کاربران و نقش‌ها</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item">
+                    <a href="{% url 'staff-users' %}"
+                        class="menu-link {% if request.resolver_match.url_name == 'staff-users' %}active{% endif %}">
+                        <div data-i18n="UsersList">حساب‌های کاربری</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="app-access-roles.html" class="menu-link">
+                        <div data-i18n="UsersRoles">نقش‌ها و مجوزها</div>
+                    </a>
+                </li>
+            </ul>
+        </li>      
+        {% endif %}
+        
+        {% comment %} <li class="menu-header small text-uppercase"><div class="divider text-start" style="margin: 0px !important;"><div class="divider-text small">مستندات و راهنما</div></div></li>
+
+        <!-- مستندات راهنما -->
+        <li class="menu-item">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-help-circle"></i>
+                <div data-i18n="Help">مستندات راهنما</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <div data-i18n="City">راهنمای سامانه</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <div data-i18n="Province">سوالات متداول</div>
+                    </a>
+                </li>
+            </ul>        
+        </li>
+
+        <!-- داشبورد -->
+        <li class="menu-item">
+            <a href="{% url 'dashboard' %}" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-support"></i>
+            <div data-i18n="Support">پشتیبانی</div>
+            </a>
+        </li>    {% endcomment %}
+                
+    </ul>
+</aside>
+<!-- / Menu -->

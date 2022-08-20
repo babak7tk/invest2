@@ -1,0 +1,121 @@
+{% extends 'Layouts/admin-master.html' %}
+{% load static %}
+{% block Styles %}
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="../../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css">
+    <link rel="stylesheet" href="../../assets/vendor/libs/typeahead-js/typeahead.css">
+    <link rel="stylesheet" href="../../assets/vendor/libs/apex-charts/apex-charts.css">
+{% endblock %}
+
+{% block content %}
+    <!-- Content wrapper -->
+    <div class="content-wrapper">
+        <!-- Content -->
+        <div class="container-xxl flex-grow-1 container-p-y">
+            <div class="row gy-4">
+                <div class="col-xl-12 col-12">
+                    <div class="card mb-4">
+                        <img src="{% static 'admin_panel/assets/dashboard-banner.jpg' %}"/>
+                    </div>
+                </div>
+             
+                <!-- خلاصه تعداد کل درخواست‌ها -->
+                <div class="col-xl-6 col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-3">کل درخواست‌ها</h5>
+                            <h1 class="display-6 fw-normal mb-0 primary-font">{{ all_requests_count }}</h1>
+                        </div>
+                        <div class="card-body">
+                            <span class="d-block mb-2">فعالیت کنونی</span>
+                            <div class="progress progress-stacked mb-3 mb-xl-5" style="height: 8px">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ pending_requests_percentage }}%" aria-valuenow="{{ pending_requests_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ correction_requests_percentage }}%" aria-valuenow="{{ correction_requests_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ approved_requests_percentage }}%" aria-valuenow="{{ approved_requests_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ issued_requests_percentage }}%" aria-valuenow="{{ issued_requests_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ rejected_requests_percentage }}%" aria-valuenow="{{ rejected_requests_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <ul class="p-0 m-0">
+                                <li class="mb-3 d-flex justify-content-between">
+                                    <div class="d-flex align-items-center me-3">
+                                    <span class="badge badge-dot bg-primary me-2"></span> در حال بررسی
+                                    </div>
+                                    <div class="d-flex gap-3">
+                                    <span>{{ pending_requests_count }}</span>
+                                    <span class="fw-semibold">{{ pending_requests_percentage }}%</span>
+                                    </div>
+                                </li>
+                                <li class="mb-3 d-flex justify-content-between">
+                                    <div class="d-flex align-items-center me-3">
+                                    <span class="badge badge-dot bg-warning me-2"></span> تکمیل و رفع نقص
+                                    </div>
+                                    <div class="d-flex gap-3">
+                                    <span>{{ correction_requests_count }}</span>
+                                    <span class="fw-semibold">{{ correction_requests_percentage }}%</span>
+                                    </div>
+                                </li>
+                                <li class="mb-3 d-flex justify-content-between">
+                                    <div class="d-flex align-items-center me-3">
+                                    <span class="badge badge-dot bg-info me-2"></span> تایید شده
+                                    </div>
+                                    <div class="d-flex gap-3">
+                                    <span>{{ approved_requests_count }}</span>
+                                    <span class="fw-semibold">{{ approved_requests_percentage }}%</span>
+                                    </div>
+                                </li>
+                                <li class="mb-3 d-flex justify-content-between">
+                                    <div class="d-flex align-items-center me-3">
+                                    <span class="badge badge-dot bg-success me-2"></span> صادر شده
+                                    </div>
+                                    <div class="d-flex gap-3">
+                                    <span>{{ issued_requests_count }}</span>
+                                    <span class="fw-semibold">{{ issued_requests_percentage }}%</span>
+                                    </div>
+                                </li>
+                                <li class="mb-3 d-flex justify-content-between">
+                                    <div class="d-flex align-items-center me-3">
+                                    <span class="badge badge-dot bg-danger me-2"></span> رد شده
+                                    </div>
+                                    <div class="d-flex gap-3">
+                                    <span>{{ rejected_requests_count }}</span>
+                                    <span class="fw-semibold">{{ rejected_requests_percentage }}%</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!--/ خلاصه تعداد کل درخواست‌ها -->
+
+                <!-- چارت -->
+                <div class="col-xl-6 col-12">
+                    <div class="card">
+                        <div class="card-header header-elements">
+                            <h5 class="card-title mb-0">آخرین آمار</h5>
+                        </div>
+                        <div class="card-body">
+                            <img src="{% static 'admin_panel/assets/temp-chart.png' %}" width="100%"/>
+                        </div>
+                   </div>     
+               </div>               
+               <!--/ چارت -->                 
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block Scripts %}
+    <!-- Vendors JS -->
+    <script src="../../assets/vendor/libs/chartjs/chartjs.js"></script>
+
+    <!-- Page JS -->
+    <script src="../../assets/js/charts-chartjs.js"></script>
+    <script>
+        {% if messages %}
+            {% for item in messages %}
+                createToast('success', '{{ item }}');
+            {% endfor %}
+        {% endif %}
+    </script>
+{% endblock %}

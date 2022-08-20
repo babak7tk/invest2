@@ -1,0 +1,120 @@
+{% extends 'Layouts/admin-master.html' %}
+{% load static public_tags %}
+
+{% block title %} لیست درخواست ها {% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+    {% if messages %}
+    {% for item in messages %}
+    <script>
+        Swal.fire({
+            title: "تبریک ! 🥳",
+            icon: 'success',
+            text: '{{ item }}',
+            type: "success",
+            cancelButtonColor: 'var(--primary)',
+            confirmButtonText: 'اوکی',
+        })
+    </script>
+    {% endfor %}
+    {% endif %}
+
+    <div class="col-lg-12">
+        <div class="card-box">
+            <div class="card-block">
+                <h4 class="card-title">
+                    {% if request.resolver_match.url_name == 'contract-request-all-list' %}همه درخواست‌ها
+                    {% elif request.resolver_match.url_name == 'contract-request-pending-list' %}درخواست‌های در حال
+                    بررسی
+                    {% elif request.resolver_match.url_name == 'contract-request-correction-list' %}درخواست‌های در
+                    انتظار تکمیل اطلاعات و رفع نقص توسط کاربر
+                    {% elif request.resolver_match.url_name == 'contract-request-approved-list' %}درخواست‌های تایید شده
+                    و در انتظار صدور کد معاملاتی بورس کالا
+                    {% elif request.resolver_match.url_name == 'contract-request-issued-list' %}درخواست‌های صادر شده
+                    {% elif request.resolver_match.url_name == 'contract-request-rejected-list' %}درخواست‌های رد شده
+                    {% endif %}
+                </h4>
+
+                <hr>
+
+                <span id="list">
+                    {% if object_list %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ردیف</th>
+                                <th>کد ملی / شناسه کاربری</th>
+                                <th>نوع شخص</th>
+                                <th>تاریخ ثبت</th>
+                                <th>مشاهده</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for item in object_list %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ item.national_id | default:'---' }}</td>
+                                <td><span
+                                        class="badge bg-{% if item.user_type == 'genuine' %}danger{% else %}success{% endif %}">{% if item.user_type == 'genuine' %}حقیقی{% else %}حقوقی{% endif %}</span>
+                                </td>
+                                <td>{{ item.created_at | jdate | default:'---' }}</td>
+                                <td>
+                                    <div class="buttons ">
+                                        <form
+                                            action="{% url 'contract-request-delete' item.id %}?next={{ request.path }}"
+                                            id="delete_form_{{ item.id }}" method="post">
+                                            {% csrf_token %}
+
+                                            <a href="{% url 'contract-request' item.id %}"
+                                                class="btn btn-warning btn-action mr-1" data-toggle="tooltip" title=""
+                                                data-original-title="مشاهده"><i class="fas fa-eye-alt"></i><i
+                                                    class="fa fa-eye"> </i> </a>
+                                            {% comment %}
+                                            <button type="button" data-original-title="حذف" data-toggle="tooltip"
+                                                onclick="DeleteConfirm('{{ item.id }}')"
+                                                class="delete_button btn btn-danger btn-action"><i class="fa fa-trash">
+                                                </i>
+                                            </button> {% endcomment %}
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <h4 style="text-align: center; padding: 40px">موردی یافت نشد.</h4>
+                    {% endif %}
+                    {% include 'Admin/pagination.html' with page_obj=page_obj %}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block Scripts %}
+<script>
+    function DeleteConfirm(id) {
+        Swal.fire({
+            title: "هشدار ! ",
+            icon: 'warning',
+            text: "آیا از حذف این آیتم اطمینان دارید؟",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#00aced',
+            cancelButtonColor: '#e6294b',
+            confirmButtonText: 'حذف',
+            cancelButtonText: 'انصراف'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#delete_form_' + id).submit();
+            }
+        })
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends 'Layouts/auth-master.html' %}
+{% load public_tags static %}
+
+{% block title %}ورود{% endblock %}
+
+{% block content %}
+    <h4 class="mb-2">ورود به سامانه</h4>
+    <p class="mb-4"></p>
+
+    <form id="formAuthentication" class="mb-3" method="POST">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% for item in form.non_field_errors %}
+                <div class="mb-2" style="color: #ff5b5c!important;">
+                    <div>{{ item|safe }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if messages %}
+            {% for item in messages %}
+                <div class="mb-2" style="color: #39da8a!important;">
+                    <div>{{ item }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="mb-3">
+            <label for="username" class="form-label">نام کاربری (کد ملی)</label>
+            <input type="text" required class="form-control text-start" dir="ltr" id="username" name="username"
+                   value="{{ form.username.value | default_if_none:'' }}"
+                   placeholder="نام کاربری خود را وارد کنید" autofocus>
+
+            {% if form.username.errors %}
+                <div style="color: #ff5b5c!important;">
+                    <div data-field="username" data-validator="notEmpty">{{ form.username.errors.0 }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3 form-password-toggle">
+            <div class="d-flex justify-content-between">
+                <label class="form-label" for="password">رمز عبور</label>
+                {% comment %} <a href="{% url 'password-reset' %}">
+                    <small>رمز عبور را فراموش کردید؟</small>
+                </a> {% endcomment %}
+            </div>
+            <div class="input-group input-group-merge">
+                <input type="password" class="form-control text-start" dir="ltr" name="password"
+                       value="{{ form.password.value | default_if_none:'' }}" required id="password"
+                       placeholder="············" aria-describedby="password">
+
+                {% if form.password.errors %}
+                    <div style="color: #ff5b5c!important;">
+                        <div data-field="password" data-validator="notEmpty">{{ form.password.errors.0 }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="id_captcha_1" class="form-label">کد امنیتی</label>
+
+            <span class="input-group-text captcha" style="padding: 0; width: 31px; border: 1px solid #ced4da; cursor: pointer; justify-content: center; display: inline-block;">
+                  <img width="16" src="{% static 'auth/images/refresh.svg' %}"><!----></span>
+
+            {{ form.captcha | addplaceholder:form.captcha.label | addclass:'form-control text-start' }}
+
+            {% if form.captcha.errors %}
+                <div style="color: #ff5b5c!important;">
+                    <div data-field="username" data-validator="notEmpty">{{ form.captcha.errors.0 }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" name="remember_me" type="checkbox" id="remember-me">
+                <label class="form-check-label" for="remember-me"> به خاطر سپاری </label>
+            </div>
+        </div>
+        <button class="btn btn-primary d-grid w-100" type="submit">ورود</button>
+    </form>
+{% endblock %}
+
+{% block Scripts %}
+    <script>
+        $('.captcha').click(function () {
+            $.getJSON("/captcha/refresh/", function (result) {
+                $('.captcha').attr('src', result['image_url']);
+                $('#id_captcha_0').val(result['key'])
+            });
+        });
+    </script>
+{% endblock %}

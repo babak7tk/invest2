@@ -1,0 +1,671 @@
+{% extends 'Layouts/admin-master.html' %}
+{% load i18n public_tags static contract_record_tags %}
+
+{% block title %} ثبت درخواست {% endblock %}
+
+{% block Styles %}
+<!-- Icons -->
+<link rel="stylesheet" href="{% static 'admin_panel/assets/vendor/fonts/boxicons.css' %}">
+<link rel="stylesheet" href="{% static 'admin_panel/assets/vendor/fonts/fontawesome.css' %}">
+<link rel="stylesheet" href="{% static 'admin_panel/assets/vendor/fonts/flag-icons.css' %}">
+
+<!-- Core CSS -->
+<link rel="stylesheet" href="{% static 'admin_panel/assets/vendor/css/rtl/core.css' %}">
+<link rel="stylesheet" href="{% static 'admin_panel/assets/vendor/css/rtl/theme-default.css' %}">
+<link rel="stylesheet" href="{% static 'admin_panel/assets/css/demo.css' %}">
+<link rel="stylesheet" href="{% static 'admin_panel/assets/vendor/css/rtl/rtl.css' %}">
+
+<!-- Vendors CSS -->
+<link rel="stylesheet" href="{% static 'admin_panel/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css' %}">
+<link rel="stylesheet" href="{% static 'admin_panel/assets/vendor/libs/typeahead-js/typeahead.css' %}">
+<link rel="stylesheet" href="{% static 'admin_panel/assets/vendor/libs/bs-stepper/bs-stepper.css' %}">
+<link rel="stylesheet" href="{% static 'admin_panel/assets/vendor/libs/bootstrap-select/bootstrap-select.css' %}">
+<link rel="stylesheet" href="{% static 'admin_panel/assets/vendor/libs/select2/select2.css' %}">
+<link rel="stylesheet"
+    href="{% static 'admin_panel/assets/vendor/libs/formvalidation/dist/css/formValidation.min.css' %}">
+
+<!-- Page CSS -->
+
+<!-- Helpers -->
+<script src="{% static 'admin_panel/assets/vendor/js/helpers.js' %}"></script>
+
+<!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+<!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
+<!-- <script src="{% static 'admin_panel/assets/vendor/js/template-customizer.js' %}"></script>-->
+<!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+<script src="{% static 'admin_panel/assets/js/config.js' %}"></script>
+
+<link rel="stylesheet" href="{% static 'css/jquery.toast.min.css' %}">
+<style>
+    .bs-stepper .step.crossed .step-trigger .bs-stepper-circle {
+        border-color: #4d7349 !important;
+        color: #4d7349 !important;
+    }
+
+    .light-style .bs-stepper .step.crossed .bs-stepper-label {
+        color: #4d7349 !important;
+    }
+
+    .bs-stepper .step.crossed .step-trigger::after {
+        background-color: #4d7349 !important;
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+<!-- Layout wrapper -->
+<div class="layout-wrapper layout-content-navbar" ng-init='init()'>
+    <div style='width: 100% !important'>
+        {% comment %} <div class="container-xxl flex-grow-1 container-p-y">
+            <h4 class="py-3 breadcrumb-wrapper mb-4"><span class="text-muted fw-light">صدور کد معاملاتی بورس کالا
+                    /</span> ثبت درخواست جدید</h4> {% endcomment %}
+
+            <!-- Header |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| -->
+            <div
+                class="card-header sticky-element bg-label-secondary d-flex justify-content-sm-between align-items-sm-center flex-column flex-sm-row">
+                <h5 class="card-title mb-sm-0 me-2">احراز هویت سرمایه‌گذاران حرفه‌ای</h5>
+                <div class="action-btns">
+                    <a href="../" class="app-brand-link">
+                        <span class="app-brand-logo demo"><img
+                                src="{% static 'admin_panel/assets/Logo-BKI-Avatar.svg' %}" />
+                            <title>کارگزاری بانک کشاورزی | سامانه معاملات و اخذ کد بورس کالا</title>
+                        </span>
+                        <span class="app-brand-text demo menu-text fw-bold ms-2"><img
+                                src="{% static 'admin_panel/assets/Logo-BKI-Title.png' %}" height="30" /></span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Default -->
+            <div class="row">
+                <!-- Default Wizard |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| -->
+                <div class="col-12 mb-4">
+                    <div class="bs-stepper wizard-numbered mt-2">
+                        <!-- مراحل %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+                        <div class="bs-stepper-header">
+                            <!-- 1 نوع شخص ================================================================= -->
+                            <div class="step" data-target="#personal-info">
+                                <button type="button" class="step-trigger" id="request-personal">
+                                    <span class="bs-stepper-circle">1</span>
+                                    <span class="bs-stepper-label">
+                                        <span class="bs-stepper-title">نوع شخص</span>
+                                        <!-- <span class="bs-stepper-subtitle">نوع شخص خود را وارد کنید</span> -->
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="line"></div>
+                            <!-- 2 تماس ========================================================================= -->
+                            <div class="step" data-target="#contact-info">
+                                <button {% if not request.user.is_staff %}ng-disabled="!user_data_frm.$valid"
+                                    {% endif %} type="button" class="step-trigger" id="request-terms">
+                                    <span class="bs-stepper-circle">2</span>
+                                    <span class="bs-stepper-label">
+                                        <span class="bs-stepper-title">توافق نامه</span>
+                                        <!-- <span class="bs-stepper-subtitle">افزودن اطلاعات تماس</span> -->
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="line"></div>
+                            <!-- 3 مالی ========================================================================= -->
+                            <div class="step" data-target="#finance-info">
+                                <button {% if not request.user.is_staff %}ng-disabled="!is_confirm_info_1" {% endif %}
+                                    type="button" class="step-trigger" id="request-professional-investment">
+                                    <span class="bs-stepper-circle">3</span>
+                                    <span class="bs-stepper-label">
+                                        <span class="bs-stepper-title">گروه سرمايه گذاران</span>
+                                        <!-- <span class="bs-stepper-subtitle">افزودن اطلاعات شغلی</span> -->
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="line"></div>
+                            <!-- 4 آپلود ======================================================================== -->
+                            <div class="step" data-target="#upload-files">
+                                <button {% if not request.user.is_staff %}ng-disabled="!request_finance_frm.$valid"
+                                    {% endif %} type="button" class="step-trigger" id="request-files">
+                                    <span class="bs-stepper-circle">4</span>
+                                    <span class="bs-stepper-label">
+                                        <span class="bs-stepper-title">آپلود مدارک</span>
+                                        <!-- <span class="bs-stepper-subtitle">افزودن اطلاعات</span> -->
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- فرم‌ها %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+                        <div class="bs-stepper-content">
+                            <!-- 1 نوع شخص ================================================================= -->
+                            <div id="personal-info" class="content">
+                                <form method="post" name="user_data_frm">
+                                    <div class="row g-3">
+
+                                        <div class="col-sm-4">
+                                            <label class="form-label" for="...">نوع شخصی</label>
+                                            <select class="form-select" id="exampleFormControlSelect1"
+                                                ng-model="data.user_type" required
+                                                ng-options="item.id as item.name for item in user_types"
+                                                aria-label="Default select example">
+                                            </select>
+
+                                            <div style="color: #ff5b5c!important;" ng-show="errors.user_type">
+                                                <div data-field="phone" data-validator="notEmpty">[[ errors.user_type[0]
+                                                    ]]
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <label class="form-label" for="...">کد ملی / شناسه کاربری</label>
+                                            <input class='form-control' minlength=8 maxlength=10 type="text"
+                                                name="national_id" ng-model="data.national_id" required>
+
+                                            <div style="color: #ff5b5c!important;" ng-show="errors.national_id">
+                                                <div data-field="phone" data-validator="notEmpty">[[
+                                                    errors.national_id[0] ]]
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-12 d-flex justify-content-between">
+                                            <button class="btn btn-label-secondary btn-prev" disabled>
+                                                <i class="bx bx-chevron-left bx-sm ms-sm-n2"></i>
+                                                <span class="d-sm-inline-block d-none">قبلی</span>
+                                            </button>
+                                            <button class="btn btn-primary" onclick='$("#request-terms").click();'
+                                                ng-disabled="!user_data_frm.$valid || is_submited">
+                                                <span class="d-sm-inline-block d-none">ادامه</span>
+                                                <i class="bx bx-chevron-left bx-sm me-sm-n2"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- 2 تماس ================================================================= -->
+                            <div id="contact-info" class="content">
+
+
+                                <div class="row g-3">
+                                    <div class="divider my-2">
+                                        <div class="divider-text"> توافق نامه</div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="alert alert-secondary" role="alert">
+                                            <p>مشتری تعهد می نماید:</p>
+                                            <p>
+                                                1. ضمن رعایت دقیق قوانین و مقررات پولشویی، اطلاعات مورد درخواست کارگزار
+                                                در موضوع مبارزه با پولشویی را مطابق مقررات ارائه نماید<br />
+                                                2. اجازه استفاده اشخاص دیگر از کد معاملاتی (خدمات پایه دریافتی) را ندهد
+                                                و در صورت اطلاع، موضوع را بلافاصله به کارگزار اطلاع دهد.<br />
+                                                3. تغییرات کدپستی و اطلاعات مربوط به نشانی های خود را به مراجع ذیربط
+                                                اطلاع دهد. آخرین نشانی های متقاضی، نشانی ارائه شده از سوی مراجع مربوطه
+                                                است حتی اگر متقاضی نشانی خود را راسا اصلاح نکرده باشد.<br />
+                                                4. هر گونه تغییر در اطلاعات ارائه شده را با مستندات مربوطه در اسرع وقت
+                                                به اطلاع کارگزار برساند.<br />
+                                                5. مدیران و صاحبان امضای مجاز مشتری ضمن اقرار به این که آخرین اطلاعات و
+                                                مدارک مربوط به مشتری را ارائه نموده اند هرگونه تغییر در اطلاعات ارائه
+                                                شده را بلافاصله به کارگزار اطلاع دهند.
+                                            </p>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" ng-model="is_confirm_info_1"
+                                                {% if request.user.is_staff %} disabled {% endif %}
+                                                id="formValidationCheckbox" name="formValidationCheckbox">
+                                            <label class="form-check-label" for="formValidationCheckbox">اینجانب
+                                                ، صحت
+                                                اطلاعات درج شده در همه قسمت ها و صفحات فرم ها را تایید
+                                                کرده و تمامی تعهدات مندرج در متون بالا را به دقت مطالعه کرده و قبول
+                                                دارم.</label>
+                                            <div class="fv-plugins-message-container invalid-feedback"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 d-flex justify-content-between">
+                                        <button class="btn btn-primary btn-prev">
+                                            <i class="bx bx-chevron-left bx-sm ms-sm-n2"></i>
+                                            <span class="d-sm-inline-block d-none">قبلی</span>
+                                        </button>
+
+                                        {% if not request.user.is_staff %}
+                                        <button ng-disabled="!is_confirm_info_1 || is_submited"
+                                            onclick='$("#request-professional-investment").click();'
+                                            class="btn btn-success">ادامه
+                                        </button>
+                                        {% endif %}
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- 3 مالی ================================================================= -->
+                            <div id="finance-info" class="content">
+                                <form method="post" name="request_finance_frm">
+                                    <div class="row g-3">
+                                        <div class="col-sm-4">
+                                            <label class="form-label" for="...">شما شامل کدام دسته از شرایط سرمایه گذار
+                                                حرفه ای می شوید؟</label>
+                                            <select required class='form-select' ng-model='data.professional_investment'
+                                                id="id_terms">
+                                                {% for item in professional_investment_choices %}
+                                                <option value="{{ item.0 }}">{{ item.1 }}</option>
+                                                {% endfor %}
+                                            </select>
+
+                                            <div style="color: #ff5b5c!important;"
+                                                ng-show="errors.professional_investment">
+                                                <div data-field="phone" data-validator="notEmpty">[[
+                                                    errors.professional_investment[0] ]]
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 d-flex justify-content-between">
+                                            <button class="btn btn-primary btn-prev">
+                                                <i class="bx bx-chevron-left bx-sm ms-sm-n2"></i>
+                                                <span class="d-sm-inline-block d-none">قبلی</span>
+                                            </button>
+                                            <button class="btn btn-primary" onclick='$("#request-files").click();'
+                                                ng-disabled="!request_finance_frm.$valid || is_submited">
+                                                <span class="d-sm-inline-block d-none">ادامه</span>
+                                                <i class="bx bx-chevron-left bx-sm me-sm-n2"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- 6 آپلود ================================================================= -->
+                            <div id="upload-files" class="content">
+                                <div class="alert alert-primary alert-dismissible" role="alert">
+                                    <h6 class="alert-heading mb-1"><i class="bx bx-xs bx-command me-2"></i>توضیحات
+                                    </h6>
+                                    {% comment %} <span>فرمت های قابل قبول: jpg, jpeg, png, bmp</span><br />
+                                    {% endcomment %}
+                                    <span>حداکثر حجم هر فایل: 1 مگابایت (1024 کیلو بایت)</span><br />
+                                    <span>تصاویر باید اسکن شده باشند و عکس از روی مدارک و فایل های ناخوانا موردپذیرش نمی
+                                        باشد.</span><br />
+                                </div>
+
+                                <form method="post" name="request_upload_doc_frm">
+                                    <div class="row g-3" ng-form="request_upload_doc_frm">
+                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                            <label class="form-label" for="...">مدرک اصول بازار سرمایه
+                                                <span
+                                                    class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
+                                            <div class="input-group">
+                                                <input type="file" class="form-control" id="id_capital_markets_file">
+                                                <label class="input-group-text"
+                                                    for="id_capital_markets_file">بارگزاری</label>
+                                            </div>
+
+                                            <div style="color: #ff5b5c!important;"
+                                                ng-show="errors.capital_markets_file">
+                                                <div data-field="phone" data-validator="notEmpty">[[
+                                                    errors.capital_markets_file[0] ]]
+                                                </div>
+                                            </div>
+
+                                            <a ng-show="data.capital_markets_file && !data.capital_markets_file.startsWith('C:')"
+                                                href="[[data.capital_markets_file]]" class='btn btn-warning'
+                                                target="_blank">نمایش</a>
+                                        </div>
+
+                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                            <label class="form-label" for="...">مدرک تحلیلگری <span
+                                                    class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
+                                            <div class="input-group">
+                                                <input type="file" class="form-control" id="id_analyst_file">
+                                                <label class="input-group-text" for="id_analyst_file">بارگزاری</label>
+                                            </div>
+
+                                            <div style="color: #ff5b5c!important;" ng-show="errors.analyst_file">
+                                                <div data-field="phone" data-validator="notEmpty">[[
+                                                    errors.analyst_file[0] ]]
+                                                </div>
+                                            </div>
+
+                                            <a ng-show="data.analyst_file && !data.analyst_file.startsWith('C:')"
+                                                href="[[data.analyst_file]]" target="_blank"
+                                                class='btn btn-warning'>نمایش</a>
+                                        </div>
+
+                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                            <label class="form-label" for="...">مدرک مدیریت سبد اوراق بهادار<span
+                                                    class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
+                                            <div class="input-group">
+                                                <input type="file" class="form-control"
+                                                    id="id_portfolio_management_file">
+                                                <label class="input-group-text"
+                                                    for="id_portfolio_management_file">بارگزاری</label>
+                                            </div>
+
+                                            <div style="color: #ff5b5c!important;"
+                                                ng-show="errors.portfolio_management_file">
+                                                <div data-field="phone" data-validator="notEmpty">[[
+                                                    errors.portfolio_management_file[0] ]]
+                                                </div>
+                                            </div>
+
+                                            <a ng-show="data.portfolio_management_file && !data.portfolio_management_file.startsWith('C:')"
+                                                href="[[data.portfolio_management_file]]" target="_blank"
+                                                class='btn btn-warning'>نمایش</a>
+                                        </div>
+
+                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                            <label class="form-label" for="...">مدرک ارزشیابی اوراق بهادار<span
+                                                    class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
+                                            <div class="input-group">
+                                                <input type="file" class="form-control"
+                                                    id="id_securities_valuation_file">
+                                                <label class="input-group-text"
+                                                    for="id_securities_valuation_file">بارگزاری</label>
+                                            </div>
+
+                                            <div style="color: #ff5b5c!important;"
+                                                ng-show="errors.securities_valuation_file">
+                                                <div data-field="phone" data-validator="notEmpty">[[
+                                                    errors.securities_valuation_file[0] ]]
+                                                </div>
+                                            </div>
+
+                                            <a ng-show="data.securities_valuation_file && !data.securities_valuation_file.startsWith('C:')"
+                                                href="[[data.securities_valuation_file]]" target="_blank"
+                                                class='btn btn-warning'>نمایش</a>
+                                        </div>
+
+                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                            <label class="form-label" for="...">مدرک تحلیلگر مالی خبره (CFA)
+                                                <span
+                                                    class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
+                                            <div class="input-group">
+                                                <input type="file" class="form-control" id="id_cfa_file">
+                                                <label class="input-group-text" for="id_cfa_file">بارگزاری</label>
+                                            </div>
+
+                                            <div style="color: #ff5b5c!important;" ng-show="errors.cfa_file">
+                                                <div data-field="phone" data-validator="notEmpty">[[
+                                                    errors.cfa_file[0] ]]
+                                                </div>
+                                            </div>
+
+                                            <a ng-show="data.cfa_file && !data.cfa_file.startsWith('C:')"
+                                                href="[[data.cfa_file]]" target="_blank"
+                                                class='btn btn-warning'>نمایش</a>
+                                        </div>
+
+
+                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                            <label class="form-label" for="...">مدرک مدیریت ریسک مالی (FRM)
+                                                <span
+                                                    class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
+                                            <div class="input-group">
+                                                <input type="file" class="form-control" id="id_frm_file">
+                                                <label class="input-group-text" for="id_frm_file">بارگزاری</label>
+                                            </div>
+
+                                            <div style="color: #ff5b5c!important;" ng-show="errors.frm_file">
+                                                <div data-field="phone" data-validator="notEmpty">[[
+                                                    errors.frm_file[0] ]]
+                                                </div>
+                                            </div>
+
+                                            <a ng-show="data.frm_file && !data.frm_file.startsWith('C:')"
+                                                href="[[data.frm_file]]" target="_blank"
+                                                class='btn btn-warning'>نمایش</a>
+                                        </div>
+
+
+                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                            <label class="form-label" for="...">مدرک حسابرسان داخلی (CIA)
+                                                <span
+                                                    class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
+                                            <div class="input-group">
+                                                <input type="file" class="form-control" id="id_cia_file">
+                                                <label class="input-group-text" for="id_cia_file">بارگزاری</label>
+                                            </div>
+
+                                            <div style="color: #ff5b5c!important;" ng-show="errors.cia_file">
+                                                <div data-field="phone" data-validator="notEmpty">[[
+                                                    errors.cia_file[0] ]]
+                                                </div>
+                                            </div>
+
+                                            <a ng-show="data.cia_file && !data.cia_file.startsWith('C:')"
+                                                href="[[data.cia_file]]" target="_blank"
+                                                class='btn btn-warning'>نمایش</a>
+                                        </div>
+
+
+                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                            <label class="form-label" for="...">مدرک حسابرسی رسمی مدیریت (CMA)
+                                                <span
+                                                    class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
+                                            <div class="input-group">
+                                                <input type="file" class="form-control" id="id_cma_file">
+                                                <label class="input-group-text" for="id_cma_file">بارگزاری</label>
+                                            </div>
+
+                                            <div style="color: #ff5b5c!important;" ng-show="errors.cma_file">
+                                                <div data-field="phone" data-validator="notEmpty">[[
+                                                    errors.cma_file[0] ]]
+                                                </div>
+                                            </div>
+
+                                            <a ng-show="data.cma_file && !data.cma_file.startsWith('C:')"
+                                                href="[[data.cma_file]]" target="_blank"
+                                                class='btn btn-warning'>نمایش</a>
+                                        </div>
+
+
+                                        <div ng-show='data.professional_investment == "capital_market"'
+                                            class="col-sm-4">
+                                            <label class="form-label" for="...">گزارش سابقه بیمه خود را در قالب فایل PDF
+                                                بازگذاری نمایید
+                                                <span
+                                                    class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
+                                            <div class="input-group">
+                                                <input type="file" class="form-control" id="id_insurance_report_file">
+                                                <label class="input-group-text"
+                                                    for="id_insurance_report_file">بارگزاری</label>
+                                            </div>
+
+                                            <div style="color: #ff5b5c!important;"
+                                                ng-show="errors.insurance_report_file">
+                                                <div data-field="phone" data-validator="notEmpty">[[
+                                                    errors.insurance_report_file[0] ]]
+                                                </div>
+                                            </div>
+
+                                            <a ng-show="data.insurance_report_file && !data.insurance_report_file.startsWith('C:')"
+                                                href="[[data.insurance_report_file]]" target="_blank"
+                                                class='btn btn-warning'>نمایش</a>
+                                        </div>
+
+
+                                        <div ng-show='data.professional_investment == "financial_institutions"'
+                                            class="col-sm-12">
+                                            <div class="alert alert-secondary" role="alert">
+                                                <p>این مورد یکبار توسط کارگزار به صورت اتوماتیک یکبار بررسی شده است. اگر
+                                                    نسبت به بررسی انجام شده اعتراض دارید درخواست بررسی مجدد را ثبت
+                                                    نمایید. در غیر این صورت گزینه پایان فرآیند را انتخاب نمایید.</p>
+                                            </div>
+                                            <div class="form-check">
+
+                                                <div class="col-sm-4">
+                                                    <label class="form-label" for="...">وضعیت</label>
+                                                    <select required class='form-select'
+                                                        ng-init="somethingHere = options[0]"
+                                                        ng-model='data.financial_institutions_status' id="id_terms">
+                                                        {% for item in review_end_proccess_choices %}
+                                                        <option value="{{ item.0 }}">{{ item.1 }}</option>
+                                                        {% endfor %}
+                                                    </select>
+
+                                                    <div style="color: #ff5b5c!important;"
+                                                        ng-show="errors.professional_investment">
+                                                        <div data-field="phone" data-validator="notEmpty">[[
+                                                            errors.professional_investment[0] ]]
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="fv-plugins-message-container invalid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div ng-show='data.professional_investment == "20_transaction_value"'
+                                            class="col-sm-12">
+                                            <div class="alert alert-secondary" role="alert">
+                                                <p>مجموع ارزش معاملات شما در بورس طی 6 ماه اخیر (انتهای هر ماه) بیشتر از 20 میلیارد ریال باشد.</p>
+                                                <p>این مورد یکبار توسط کارگزار به صورت اتوماتیک یکبار بررسی شده است. اگر
+                                                    نسبت به بررسی انجام شده اعتراض دارید درخواست بررسی مجدد را ثبت
+                                                    نمایید. در غیر این صورت گزینه پایان فرآیند را انتخاب نمایید.</p>
+                                            </div>
+                                            <div class="form-check">
+
+                                                <div class="col-sm-4">
+                                                    <label class="form-label" for="...">وضعیت</label>
+                                                    <select required class='form-select'
+                                                        ng-init="somethingHere = options[0]"
+                                                        ng-model='data.financial_institutions_status' id="id_terms">
+                                                        {% for item in review_end_proccess_choices %}
+                                                        <option value="{{ item.0 }}">{{ item.1 }}</option>
+                                                        {% endfor %}
+                                                    </select>
+
+                                                    <div style="color: #ff5b5c!important;"
+                                                        ng-show="errors.professional_investment">
+                                                        <div data-field="phone" data-validator="notEmpty">[[
+                                                            errors.professional_investment[0] ]]
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="fv-plugins-message-container invalid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div ng-show='data.professional_investment == "50_portfolio_value"'
+                                            class="col-sm-12">
+                                            <div class="alert alert-secondary" role="alert">
+                                                <p>مجموع ارزش پرتفوی و قدرت خرید شما در 6 ماه اخیر (انتهای هر ماه) بیشتر از 50 میلیارد ریال باشد.</p>
+                                                <p>این مورد یکبار توسط کارگزار به صورت اتوماتیک یکبار بررسی شده است. اگر
+                                                    نسبت به بررسی انجام شده اعتراض دارید درخواست بررسی مجدد را ثبت
+                                                    نمایید. در غیر این صورت گزینه پایان فرآیند را انتخاب نمایید.</p>
+                                            </div>
+                                            <div class="form-check">
+
+                                                <div class="col-sm-4">
+                                                    <label class="form-label" for="...">وضعیت</label>
+                                                    <select required class='form-select'
+                                                        ng-init="somethingHere = options[0]"
+                                                        ng-model='data.financial_institutions_status' id="id_terms">
+                                                        {% for item in review_end_proccess_choices %}
+                                                        <option value="{{ item.0 }}">{{ item.1 }}</option>
+                                                        {% endfor %}
+                                                    </select>
+
+                                                    <div style="color: #ff5b5c!important;"
+                                                        ng-show="errors.professional_investment">
+                                                        <div data-field="phone" data-validator="notEmpty">[[
+                                                            errors.professional_investment[0] ]]
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="fv-plugins-message-container invalid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 d-flex justify-content-between">
+                                            <button class="btn btn-primary btn-prev">
+                                                <i class="bx bx-chevron-left bx-sm ms-sm-n2"></i>
+                                                <span class="d-sm-inline-block d-none">قبلی</span>
+                                            </button>
+                                            
+                                            {% if not object %}
+                                                <button
+                                                    ng-show='data.professional_investment == "bourse" || data.professional_investment == "capital_market"'
+                                                    type="button" class="btn btn-primary" ng-click="SubmitReqData()"
+                                                    ng-disabled="is_submited">
+                                                    <span class="d-sm-inline-block d-none">ثبت درخواست</span>
+                                                    <i class="bx bx-chevron-left bx-sm me-sm-n2"></i>
+                                                </button>
+
+                                                <button
+                                                    ng-show='data.professional_investment != "bourse" && data.professional_investment != "capital_market"'
+                                                    type="button" class="btn btn-primary" ng-click="SubmitReqData()"
+                                                    ng-disabled="request_upload_doc_frm.$invalid || is_submited">
+                                                    <span class="d-sm-inline-block d-none">ثبت درخواست</span>
+                                                    <i class="bx bx-chevron-left bx-sm me-sm-n2"></i>
+                                                </button>
+                                            {% endif %}
+
+                                        </div>
+                                    </div>
+                                </form>
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- /Default Wizard -->
+            </div>
+        </div>
+
+        <!-- Overlay -->
+        <div class="layout-overlay layout-menu-toggle"></div>
+
+        <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+        <div class="drag-target"></div>
+    </div>
+    <!-- / Layout wrapper -->
+    {% endblock %}
+
+    {% block Scripts %}
+    {% comment %}
+    <!-- Core JS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+    <!-- build:js assets/vendor/js/core.js -->
+    <script src="{% static 'admin_panel/assets/vendor/libs/jquery/jquery.js' %}"></script>
+    <script src="{% static 'admin_panel/assets/vendor/libs/popper/popper.js' %}"></script>
+    <script src="{% static 'admin_panel/assets/vendor/js/bootstrap.js' %}"></script>
+    <script src="{% static 'admin_panel/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+
+    <script src="{% static 'admin_panel/assets/vendor/libs/hammer/hammer.js' %}"></script>
+
+    <script src="{% static 'admin_panel/assets/vendor/libs/i18n/i18n.js' %}"></script>
+    <script src="{% static 'admin_panel/assets/vendor/libs/typeahead-js/typeahead.js' %}"></script>
+
+    <script src="{% static 'admin_panel/assets/vendor/js/menu.js' %}"></script>
+    <!-- endbuild -->
+
+    <!-- Vendors JS -->
+    <script src="{% static 'admin_panel/assets/vendor/libs/bs-stepper/bs-stepper.js' %}"></script>
+    <script src="{% static 'admin_panel/assets/vendor/libs/bootstrap-select/bootstrap-select.js' %}"></script>
+    <script src="{% static 'admin_panel/assets/vendor/libs/bootstrap-select/i18n/defaults-fa_IR.js' %}"></script>
+    <script src="{% static 'admin_panel/assets/vendor/libs/select2/select2.js' %}"></script>
+    <script src="{% static 'admin_panel/assets/vendor/libs/select2/i18n/fa.js' %}"></script>
+    <script src="{% static 'admin_panel/assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js' %}"></script>
+    <script src="{% static 'admin_panel/assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js' %}">
+    </script>
+    <script src="{% static 'admin_panel/assets/vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js' %}">
+    </script>
+
+    <!-- Main JS -->
+    <script src="{% static 'admin_panel/assets/js/main.js' %}"></script>
+
+    <!-- Page JS -->
+    <script src="{% static 'admin_panel/assets/js/form-wizard-validation.js' %}"></script>
+    {% endcomment %}
+
+    <script src="{% static 'admin_panel/assets/js/form-wizard-numbered.js' %}"></script>
+    <script src="{% static 'js/jquery.toast.min.js' %}"></script>
+
+    <script>
+        {% include 'contract_records/admin/form.js' %}
+    </script>
+    {% endblock %}
