@@ -62,6 +62,13 @@ class ContactRequest(CustomModel):
         choices=REVIEW_END_PROCCESS_CHOICES
     )
 
+    legal_category_status = models.CharField(
+        max_length=200,
+        verbose_name="وضعیت دسته بندی حقوقی سرمایه گذار",
+        default='end_process',
+        choices=REVIEW_END_PROCCESS_CHOICES
+    )
+
     """ Files """
     capital_markets_file = models.FileField(
         verbose_name='مدرک اصول بازار سرمایه', null=True, blank=True,
@@ -127,6 +134,13 @@ class ContactRequest(CustomModel):
 
     insurance_report_file = models.FileField(
         verbose_name='مدرک گزارش سایقه بیمه', null=True, blank=True, upload_to=upload_files,
+        validators=[
+            validate_file_size
+        ],
+    )
+
+    account_circulation_report_file = models.FileField(
+        verbose_name='فایل گزارش گردش حساب', null=True, blank=True, upload_to=upload_files,
         validators=[
             validate_file_size
         ],

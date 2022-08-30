@@ -110,6 +110,7 @@
                             <!-- 3 مالی ========================================================================= -->
                             <div class="step" data-target="#finance-info">
                                 <button {% if not request.user.is_staff %}ng-disabled="!is_confirm_info_1" {% endif %}
+{#                                <button {% if not request.user.is_staff %}ng-disabled="!user_data_frm.$valid" {% endif %}#}
                                     type="button" class="step-trigger" id="request-professional-investment">
                                     <span class="bs-stepper-circle">3</span>
                                     <span class="bs-stepper-label">
@@ -147,7 +148,7 @@
                                                 aria-label="Default select example">
                                             </select>
 
-                                            <div style="color: #ff5b5c!important;" ng-show="errors.user_type">
+                                            <div style="color: #ff5b5c!important;" ng-if="errors.user_type">
                                                 <div data-field="phone" data-validator="notEmpty">[[ errors.user_type[0]
                                                     ]]
                                                 </div>
@@ -156,11 +157,11 @@
                                         </div>
 
                                         <div class="col-sm-4">
-                                            <label class="form-label" for="...">کد ملی / شناسه کاربری</label>
+                                            <label class="form-label" for="...">کد ملی / شناسه ملی</label>
                                             <input class='form-control' minlength=8 maxlength=10 type="text"
                                                 name="national_id" ng-model="data.national_id" required>
 
-                                            <div style="color: #ff5b5c!important;" ng-show="errors.national_id">
+                                            <div style="color: #ff5b5c!important;" ng-if="errors.national_id">
                                                 <div data-field="phone" data-validator="notEmpty">[[
                                                     errors.national_id[0] ]]
                                                 </div>
@@ -174,6 +175,7 @@
                                                 <span class="d-sm-inline-block d-none">قبلی</span>
                                             </button>
                                             <button class="btn btn-primary" onclick='$("#request-terms").click();'
+{#                                            <button class="btn btn-primary" onclick='$("#request-professional-investment").click();'#}
                                                 ng-disabled="!user_data_frm.$valid || is_submited">
                                                 <span class="d-sm-inline-block d-none">ادامه</span>
                                                 <i class="bx bx-chevron-left bx-sm me-sm-n2"></i>
@@ -228,12 +230,12 @@
                                             <span class="d-sm-inline-block d-none">قبلی</span>
                                         </button>
 
-                                        {% if not request.user.is_staff %}
+{#                                        {% if not request.user.is_staff %}#}
                                         <button ng-disabled="!is_confirm_info_1 || is_submited"
                                             onclick='$("#request-professional-investment").click();'
-                                            class="btn btn-success">ادامه
+                                            class="btn btn-primary">ادامه
                                         </button>
-                                        {% endif %}
+{#                                        {% endif %}#}
                                     </div>
 
                                 </div>
@@ -244,17 +246,18 @@
                                 <form method="post" name="request_finance_frm">
                                     <div class="row g-3">
                                         <div class="col-sm-4">
-                                            <label class="form-label" for="...">شما شامل کدام دسته از شرایط سرمایه گذار
+                                            <label ng-if="data.user_type == 'genuine'" class="form-label" for="...">شما شامل کدام دسته از شرایط سرمایه گذار
                                                 حرفه ای می شوید؟</label>
+                                            <label ng-if="data.user_type == 'legal'" class="form-label" for="...">شرکت شما شامل کدام دسته از شرایط سرمایه گذار
+                                                حرفه ای می شود؟</label>
+
                                             <select required class='form-select' ng-model='data.professional_investment'
                                                 id="id_terms">
-                                                {% for item in professional_investment_choices %}
-                                                <option value="{{ item.0 }}">{{ item.1 }}</option>
-                                                {% endfor %}
+                                                <option ng-repeat="item in professional_investments" value="[[item.id]]">[[item.name]]</option>
                                             </select>
 
                                             <div style="color: #ff5b5c!important;"
-                                                ng-show="errors.professional_investment">
+                                                ng-if="errors.professional_investment">
                                                 <div data-field="phone" data-validator="notEmpty">[[
                                                     errors.professional_investment[0] ]]
                                                 </div>
@@ -290,176 +293,176 @@
 
                                 <form method="post" name="request_upload_doc_frm">
                                     <div class="row g-3" ng-form="request_upload_doc_frm">
-                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                        <div ng-if='data.professional_investment == "bourse"' class="col-sm-4">
                                             <label class="form-label" for="...">مدرک اصول بازار سرمایه
                                                 <span
                                                     class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
                                             <div class="input-group">
                                                 <input type="file" class="form-control" id="id_capital_markets_file">
                                                 <label class="input-group-text"
-                                                    for="id_capital_markets_file">بارگزاری</label>
+                                                    for="id_capital_markets_file">بارگذاری</label>
                                             </div>
 
                                             <div style="color: #ff5b5c!important;"
-                                                ng-show="errors.capital_markets_file">
+                                                ng-if="errors.capital_markets_file">
                                                 <div data-field="phone" data-validator="notEmpty">[[
                                                     errors.capital_markets_file[0] ]]
                                                 </div>
                                             </div>
 
-                                            <a ng-show="data.capital_markets_file && !data.capital_markets_file.startsWith('C:')"
+                                            <a ng-if="data.capital_markets_file && !data.capital_markets_file.startsWith('C:')"
                                                 href="[[data.capital_markets_file]]" class='btn btn-warning'
                                                 target="_blank">نمایش</a>
                                         </div>
 
-                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                        <div ng-if='data.professional_investment == "bourse"' class="col-sm-4">
                                             <label class="form-label" for="...">مدرک تحلیلگری <span
                                                     class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
                                             <div class="input-group">
                                                 <input type="file" class="form-control" id="id_analyst_file">
-                                                <label class="input-group-text" for="id_analyst_file">بارگزاری</label>
+                                                <label class="input-group-text" for="id_analyst_file">بارگذاری</label>
                                             </div>
 
-                                            <div style="color: #ff5b5c!important;" ng-show="errors.analyst_file">
+                                            <div style="color: #ff5b5c!important;" ng-if="errors.analyst_file">
                                                 <div data-field="phone" data-validator="notEmpty">[[
                                                     errors.analyst_file[0] ]]
                                                 </div>
                                             </div>
 
-                                            <a ng-show="data.analyst_file && !data.analyst_file.startsWith('C:')"
+                                            <a ng-if="data.analyst_file && !data.analyst_file.startsWith('C:')"
                                                 href="[[data.analyst_file]]" target="_blank"
                                                 class='btn btn-warning'>نمایش</a>
                                         </div>
 
-                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                        <div ng-if='data.professional_investment == "bourse"' class="col-sm-4">
                                             <label class="form-label" for="...">مدرک مدیریت سبد اوراق بهادار<span
                                                     class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
                                             <div class="input-group">
                                                 <input type="file" class="form-control"
                                                     id="id_portfolio_management_file">
                                                 <label class="input-group-text"
-                                                    for="id_portfolio_management_file">بارگزاری</label>
+                                                    for="id_portfolio_management_file">بارگذاری</label>
                                             </div>
 
                                             <div style="color: #ff5b5c!important;"
-                                                ng-show="errors.portfolio_management_file">
+                                                ng-if="errors.portfolio_management_file">
                                                 <div data-field="phone" data-validator="notEmpty">[[
                                                     errors.portfolio_management_file[0] ]]
                                                 </div>
                                             </div>
 
-                                            <a ng-show="data.portfolio_management_file && !data.portfolio_management_file.startsWith('C:')"
+                                            <a ng-if="data.portfolio_management_file && !data.portfolio_management_file.startsWith('C:')"
                                                 href="[[data.portfolio_management_file]]" target="_blank"
                                                 class='btn btn-warning'>نمایش</a>
                                         </div>
 
-                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                        <div ng-if='data.professional_investment == "bourse"' class="col-sm-4">
                                             <label class="form-label" for="...">مدرک ارزشیابی اوراق بهادار<span
                                                     class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
                                             <div class="input-group">
                                                 <input type="file" class="form-control"
                                                     id="id_securities_valuation_file">
                                                 <label class="input-group-text"
-                                                    for="id_securities_valuation_file">بارگزاری</label>
+                                                    for="id_securities_valuation_file">بارگذاری</label>
                                             </div>
 
                                             <div style="color: #ff5b5c!important;"
-                                                ng-show="errors.securities_valuation_file">
+                                                ng-if="errors.securities_valuation_file">
                                                 <div data-field="phone" data-validator="notEmpty">[[
                                                     errors.securities_valuation_file[0] ]]
                                                 </div>
                                             </div>
 
-                                            <a ng-show="data.securities_valuation_file && !data.securities_valuation_file.startsWith('C:')"
+                                            <a ng-if="data.securities_valuation_file && !data.securities_valuation_file.startsWith('C:')"
                                                 href="[[data.securities_valuation_file]]" target="_blank"
                                                 class='btn btn-warning'>نمایش</a>
                                         </div>
 
-                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                        <div ng-if='data.professional_investment == "bourse"' class="col-sm-4">
                                             <label class="form-label" for="...">مدرک تحلیلگر مالی خبره (CFA)
                                                 <span
                                                     class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
                                             <div class="input-group">
                                                 <input type="file" class="form-control" id="id_cfa_file">
-                                                <label class="input-group-text" for="id_cfa_file">بارگزاری</label>
+                                                <label class="input-group-text" for="id_cfa_file">بارگذاری</label>
                                             </div>
 
-                                            <div style="color: #ff5b5c!important;" ng-show="errors.cfa_file">
+                                            <div style="color: #ff5b5c!important;" ng-if="errors.cfa_file">
                                                 <div data-field="phone" data-validator="notEmpty">[[
                                                     errors.cfa_file[0] ]]
                                                 </div>
                                             </div>
 
-                                            <a ng-show="data.cfa_file && !data.cfa_file.startsWith('C:')"
+                                            <a ng-if="data.cfa_file && !data.cfa_file.startsWith('C:')"
                                                 href="[[data.cfa_file]]" target="_blank"
                                                 class='btn btn-warning'>نمایش</a>
                                         </div>
 
 
-                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                        <div ng-if='data.professional_investment == "bourse"' class="col-sm-4">
                                             <label class="form-label" for="...">مدرک مدیریت ریسک مالی (FRM)
                                                 <span
                                                     class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
                                             <div class="input-group">
                                                 <input type="file" class="form-control" id="id_frm_file">
-                                                <label class="input-group-text" for="id_frm_file">بارگزاری</label>
+                                                <label class="input-group-text" for="id_frm_file">بارگذاری</label>
                                             </div>
 
-                                            <div style="color: #ff5b5c!important;" ng-show="errors.frm_file">
+                                            <div style="color: #ff5b5c!important;" ng-if="errors.frm_file">
                                                 <div data-field="phone" data-validator="notEmpty">[[
                                                     errors.frm_file[0] ]]
                                                 </div>
                                             </div>
 
-                                            <a ng-show="data.frm_file && !data.frm_file.startsWith('C:')"
+                                            <a ng-if="data.frm_file && !data.frm_file.startsWith('C:')"
                                                 href="[[data.frm_file]]" target="_blank"
                                                 class='btn btn-warning'>نمایش</a>
                                         </div>
 
 
-                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                        <div ng-if='data.professional_investment == "bourse"' class="col-sm-4">
                                             <label class="form-label" for="...">مدرک حسابرسان داخلی (CIA)
                                                 <span
                                                     class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
                                             <div class="input-group">
                                                 <input type="file" class="form-control" id="id_cia_file">
-                                                <label class="input-group-text" for="id_cia_file">بارگزاری</label>
+                                                <label class="input-group-text" for="id_cia_file">بارگذاری</label>
                                             </div>
 
-                                            <div style="color: #ff5b5c!important;" ng-show="errors.cia_file">
+                                            <div style="color: #ff5b5c!important;" ng-if="errors.cia_file">
                                                 <div data-field="phone" data-validator="notEmpty">[[
                                                     errors.cia_file[0] ]]
                                                 </div>
                                             </div>
 
-                                            <a ng-show="data.cia_file && !data.cia_file.startsWith('C:')"
+                                            <a ng-if="data.cia_file && !data.cia_file.startsWith('C:')"
                                                 href="[[data.cia_file]]" target="_blank"
                                                 class='btn btn-warning'>نمایش</a>
                                         </div>
 
 
-                                        <div ng-show='data.professional_investment == "bourse"' class="col-sm-4">
+                                        <div ng-if='data.professional_investment == "bourse"' class="col-sm-4">
                                             <label class="form-label" for="...">مدرک حسابرسی رسمی مدیریت (CMA)
                                                 <span
                                                     class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
                                             <div class="input-group">
                                                 <input type="file" class="form-control" id="id_cma_file">
-                                                <label class="input-group-text" for="id_cma_file">بارگزاری</label>
+                                                <label class="input-group-text" for="id_cma_file">بارگذاری</label>
                                             </div>
 
-                                            <div style="color: #ff5b5c!important;" ng-show="errors.cma_file">
+                                            <div style="color: #ff5b5c!important;" ng-if="errors.cma_file">
                                                 <div data-field="phone" data-validator="notEmpty">[[
                                                     errors.cma_file[0] ]]
                                                 </div>
                                             </div>
 
-                                            <a ng-show="data.cma_file && !data.cma_file.startsWith('C:')"
+                                            <a ng-if="data.cma_file && !data.cma_file.startsWith('C:')"
                                                 href="[[data.cma_file]]" target="_blank"
                                                 class='btn btn-warning'>نمایش</a>
                                         </div>
 
 
-                                        <div ng-show='data.professional_investment == "capital_market"'
+                                        <div ng-if='data.professional_investment == "capital_market"'
                                             class="col-sm-4">
                                             <label class="form-label" for="...">گزارش سابقه بیمه خود را در قالب فایل PDF
                                                 بازگذاری نمایید
@@ -468,23 +471,23 @@
                                             <div class="input-group">
                                                 <input type="file" class="form-control" id="id_insurance_report_file">
                                                 <label class="input-group-text"
-                                                    for="id_insurance_report_file">بارگزاری</label>
+                                                    for="id_insurance_report_file">بارگذاری</label>
                                             </div>
 
                                             <div style="color: #ff5b5c!important;"
-                                                ng-show="errors.insurance_report_file">
+                                                ng-if="errors.insurance_report_file">
                                                 <div data-field="phone" data-validator="notEmpty">[[
                                                     errors.insurance_report_file[0] ]]
                                                 </div>
                                             </div>
 
-                                            <a ng-show="data.insurance_report_file && !data.insurance_report_file.startsWith('C:')"
+                                            <a ng-if="data.insurance_report_file && !data.insurance_report_file.startsWith('C:')"
                                                 href="[[data.insurance_report_file]]" target="_blank"
                                                 class='btn btn-warning'>نمایش</a>
                                         </div>
 
 
-                                        <div ng-show='data.professional_investment == "financial_institutions"'
+                                        <div ng-if='data.professional_investment == "financial_institutions"'
                                             class="col-sm-12">
                                             <div class="alert alert-secondary" role="alert">
                                                 <p>این مورد یکبار توسط کارگزار به صورت اتوماتیک یکبار بررسی شده است. اگر
@@ -496,7 +499,7 @@
                                                 <div class="col-sm-4">
                                                     <label class="form-label" for="...">وضعیت</label>
                                                     <select required class='form-select'
-                                                        ng-init="somethingHere = options[0]"
+                                                        ng-init="somethingHere = 'end_process'"
                                                         ng-model='data.financial_institutions_status' id="id_terms">
                                                         {% for item in review_end_proccess_choices %}
                                                         <option value="{{ item.0 }}">{{ item.1 }}</option>
@@ -504,7 +507,7 @@
                                                     </select>
 
                                                     <div style="color: #ff5b5c!important;"
-                                                        ng-show="errors.professional_investment">
+                                                        ng-if="errors.professional_investment">
                                                         <div data-field="phone" data-validator="notEmpty">[[
                                                             errors.professional_investment[0] ]]
                                                         </div>
@@ -515,7 +518,7 @@
                                             </div>
                                         </div>
 
-                                        <div ng-show='data.professional_investment == "20_transaction_value"'
+                                        <div ng-if='data.professional_investment == "20_transaction_value"'
                                             class="col-sm-12">
                                             <div class="alert alert-secondary" role="alert">
                                                 <p>مجموع ارزش معاملات شما در بورس طی 6 ماه اخیر (انتهای هر ماه) بیشتر از 20 میلیارد ریال باشد.</p>
@@ -528,7 +531,7 @@
                                                 <div class="col-sm-4">
                                                     <label class="form-label" for="...">وضعیت</label>
                                                     <select required class='form-select'
-                                                        ng-init="somethingHere = options[0]"
+                                                        ng-init="somethingHere = 'end_process'"
                                                         ng-model='data.financial_institutions_status' id="id_terms">
                                                         {% for item in review_end_proccess_choices %}
                                                         <option value="{{ item.0 }}">{{ item.1 }}</option>
@@ -536,7 +539,7 @@
                                                     </select>
 
                                                     <div style="color: #ff5b5c!important;"
-                                                        ng-show="errors.professional_investment">
+                                                        ng-if="errors.professional_investment">
                                                         <div data-field="phone" data-validator="notEmpty">[[
                                                             errors.professional_investment[0] ]]
                                                         </div>
@@ -547,7 +550,7 @@
                                             </div>
                                         </div>
 
-                                        <div ng-show='data.professional_investment == "50_portfolio_value"'
+                                        <div ng-if='data.professional_investment == "50_portfolio_value"'
                                             class="col-sm-12">
                                             <div class="alert alert-secondary" role="alert">
                                                 <p>مجموع ارزش پرتفوی و قدرت خرید شما در 6 ماه اخیر (انتهای هر ماه) بیشتر از 50 میلیارد ریال باشد.</p>
@@ -560,7 +563,7 @@
                                                 <div class="col-sm-4">
                                                     <label class="form-label" for="...">وضعیت</label>
                                                     <select required class='form-select'
-                                                        ng-init="somethingHere = options[0]"
+                                                        ng-init="somethingHere = 'end_process'"
                                                         ng-model='data.financial_institutions_status' id="id_terms">
                                                         {% for item in review_end_proccess_choices %}
                                                         <option value="{{ item.0 }}">{{ item.1 }}</option>
@@ -568,7 +571,7 @@
                                                     </select>
 
                                                     <div style="color: #ff5b5c!important;"
-                                                        ng-show="errors.professional_investment">
+                                                        ng-if="errors.professional_investment">
                                                         <div data-field="phone" data-validator="notEmpty">[[
                                                             errors.professional_investment[0] ]]
                                                         </div>
@@ -579,15 +582,67 @@
                                             </div>
                                         </div>
 
+                                         <div ng-if='data.professional_investment == "active_in_insurance_bank" || data.professional_investment == "equity" || data.professional_investment == "average_portfolio_value"'
+                                            class="col-sm-12">
+                                            <div class="alert alert-secondary" role="alert">
+                                                <p>این مورد یکبار توسط کارگزار به صورت اتوماتیک یکبار بررسی شده است. اگر
+                                                    نسبت به بررسی انجام شده اعتراض دارید درخواست بررسی مجدد را ثبت
+                                                    نمایید. در غیر این صورت گزینه پایان فرآیند را انتخاب نمایید.</p>
+                                            </div>
+                                            <div class="form-check">
+
+                                                <div class="col-sm-4">
+                                                    <label class="form-label" for="...">وضعیت</label>
+                                                    <select required class='form-select'
+                                                        ng-init="somethingHere = 'end_process'"
+                                                        ng-model='data.legal_category_status' id="id_terms">
+                                                        {% for item in review_end_proccess_choices %}
+                                                        <option value="{{ item.0 }}">{{ item.1 }}</option>
+                                                        {% endfor %}
+                                                    </select>
+
+                                                    <div style="color: #ff5b5c!important;"
+                                                        ng-if="errors.legal_category_status">
+                                                        <div data-field="phone" data-validator="notEmpty">[[
+                                                            errors.legal_category_status[0] ]]
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="fv-plugins-message-container invalid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div ng-if='data.professional_investment == "bank_account_turnover_during"' class="col-sm-4">
+                                            <label class="form-label" for="...">لطفا گزارش گردش حساب خود را در قالب فایل pdf با رعایت شرایط ذیل آپلود نمایید.
+                                                <span
+                                                    class="badge rounded-pill bg-label-secondary">اختیاری</span></label>
+                                            <label class="form-label" style="font-size: 13px!important;">گزارش مالی شش ماه اخیر با گردش حساب ماهانه بالای ده میلیارد تومان ارسال گردد.</label>
+                                            <div class="input-group">
+                                                <input type="file" class="form-control" id="id_account_circulation_report_file">
+                                                <label class="input-group-text" for="id_account_circulation_report_file">بارگذاری</label>
+                                            </div>
+
+                                            <div style="color: #ff5b5c!important;" ng-if="errors.account_circulation_report_file">
+                                                <div data-field="phone" data-validator="notEmpty">[[
+                                                    errors.account_circulation_report_file[0] ]]
+                                                </div>
+                                            </div>
+
+                                            <a ng-if="data.account_circulation_report_file && !data.account_circulation_report_file.startsWith('C:')"
+                                                href="[[data.account_circulation_report_file]]" target="_blank"
+                                                class='btn btn-warning'>نمایش</a>
+                                        </div>
+
                                         <div class="col-12 d-flex justify-content-between">
                                             <button class="btn btn-primary btn-prev">
                                                 <i class="bx bx-chevron-left bx-sm ms-sm-n2"></i>
                                                 <span class="d-sm-inline-block d-none">قبلی</span>
                                             </button>
-                                            
+
                                             {% if not object %}
                                                 <button
-                                                    ng-show='data.professional_investment == "bourse" || data.professional_investment == "capital_market"'
+                                                    ng-if='data.professional_investment == "bourse" || data.professional_investment == "capital_market" || data.professional_investment == "bank_account_turnover_during"'
                                                     type="button" class="btn btn-primary" ng-click="SubmitReqData()"
                                                     ng-disabled="is_submited">
                                                     <span class="d-sm-inline-block d-none">ثبت درخواست</span>
@@ -595,7 +650,7 @@
                                                 </button>
 
                                                 <button
-                                                    ng-show='data.professional_investment != "bourse" && data.professional_investment != "capital_market"'
+                                                    ng-if='data.professional_investment != "bourse" && data.professional_investment != "capital_market" && data.professional_investment != "bank_account_turnover_during"'
                                                     type="button" class="btn btn-primary" ng-click="SubmitReqData()"
                                                     ng-disabled="request_upload_doc_frm.$invalid || is_submited">
                                                     <span class="d-sm-inline-block d-none">ثبت درخواست</span>

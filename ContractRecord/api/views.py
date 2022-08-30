@@ -24,6 +24,19 @@ class ContactRequestViewSet(viewsets.ModelViewSet):
         return qs
 
     def get_permissions(self):
-        if self.action != 'create':
+        if self.action not in ['create', 'get_professional_investment_list']:
             self.permission_classes = [IsAdminUser]
         return super().get_permissions()
+
+    @action(
+        detail=False,
+        methods=['get'],
+        url_path='professional_investments',
+    )
+    def get_professional_investment_list(self, request):
+        if request.GET.get('type') != 'legal':
+            data = [{'id': item[0], 'name': item[1]} for item in PROFESSIONAL_INVETMENT_CHOICES[0:5]]
+        else:
+            data = [{'id': item[0], 'name': item[1]} for item in PROFESSIONAL_INVETMENT_CHOICES[5:]]
+
+        return Response(data)

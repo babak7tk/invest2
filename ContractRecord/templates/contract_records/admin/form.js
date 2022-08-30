@@ -3,6 +3,7 @@ app.controller('myCtrl', function ($scope, $http) {
 
                 $scope.id = null;
                 $scope.data = null;
+                $scope.professional_investment = [];
                 $scope.is_submited = '';
                 $scope.is_confirm_info_1 = false;
 
@@ -20,7 +21,31 @@ app.controller('myCtrl', function ($scope, $http) {
                     {% endif %}
                 }
 
+                $scope.$watch('data.user_type', function(newValue, oldValue) {
+                    console.log(newValue);
+                    $scope.GetProfessionalInvestments();
+                });
+
                 // Request Data
+            $scope.GetProfessionalInvestments = function () {
+                    $scope.is_submited = true;
+
+                    if ($scope.data){
+                        var url = `/api/request/professional_investments/?type=` + $scope.data['user_type'];
+                    }
+                    else {
+                        var url = `/api/request/professional_investments/`;
+                    }
+                    $http.get(url).then(res => {
+                        $scope.is_submited = false;
+                        $scope.professional_investments = res.data;
+                        console.log($scope.professional_investments);
+                    }).catch(err => {
+                        $scope.is_submited = false;
+                        parseError(err, 'خطایی رخ داد');
+                    });
+                }
+
                 $scope.GetReqData = function () {
                     $scope.is_submited = true;
 
@@ -56,10 +81,11 @@ app.controller('myCtrl', function ($scope, $http) {
                         'cia_file',
                         'cma_file',
                         'insurance_report_file',
+                        'account_circulation_report_file',
                     ];
 
                     for (const item in files) {
-                        if ($(`#id_${files[item]}`)[0].files[0]) {
+                        if ($(`#id_${files[item]}`)[0] && $(`#id_${files[item]}`)[0].files[0]) {
                             fd.append(`${files[item]}`, $(`#id_${files[item]}`)[0].files[0]);
                         }
                         {% comment %} else{
